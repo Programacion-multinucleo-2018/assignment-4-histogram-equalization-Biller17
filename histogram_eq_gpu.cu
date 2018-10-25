@@ -10,7 +10,8 @@
 
 using namespace std;
 
-
+//Adrian Biller A01018940
+//historgram equalizer 
 
 
 
