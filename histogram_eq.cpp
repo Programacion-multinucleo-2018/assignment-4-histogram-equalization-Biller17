@@ -23,13 +23,14 @@ void image_histogram_equalizer(const cv::Mat& input, cv::Mat& output)
 
 
 	for (int i=0; i<256; i++) {
+		// #pragma omp atomic
 		accumulated += histogram[i];
 		normalized_histogram[i] = accumulated * 255 / (input.cols*input.rows);
 	}
 
   //updating image with normalized histogram
 	for (int pixel_tid = 0; pixel_tid < input.cols*input.rows; pixel_tid++) {
-		#pragma omp atomic
+
     output.data[pixel_tid] = normalized_histogram[ (int)input.data[pixel_tid] ];
   }
 }
@@ -38,7 +39,6 @@ void image_histogram_equalizer(const cv::Mat& input, cv::Mat& output)
 
 
 
-// Main function
 int main(int argc, char *argv[])
 {
 	string imagePath;
