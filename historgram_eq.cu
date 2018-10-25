@@ -111,11 +111,19 @@ int main(int argc, char *argv[])
 	namedWindow("Output", cv::WINDOW_NORMAL);
 
 	//Show the input and output
-	imshow("Input", input);
 	imshow("Output", output);
+
+
+
+	//once converted to grey we can get the histogram
+	
 
 	//Wait for key press
 	cv::waitKey();
+
+
+
+
 
 	return 0;
 }
