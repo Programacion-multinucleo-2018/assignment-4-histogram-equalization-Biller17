@@ -24,3 +24,17 @@ Rubric:
 5. For the GPU version, used shared memory where necessary.
 6. Both images are displayed at the end.
 7. Calculation times and speedup obtained are incuded in the Readme.
+
+
+EDIT:
+
+runtimes using CPU:
+94.247032 ms
+95.471710 ms
+94.398582 ms
+95.669907 ms
+94.233986 ms
+95.468224 ms
+97.374977 ms
+94.861595 ms
+95.584518 ms
