@@ -42,8 +42,10 @@ __global__ void normalize_histogram(const char *input,int* histogram, int* norma
 	for(int x = 0; x <= idx;  x ++){
 		accumulated += histogram[x];
 	}
-	normalized_histogram[idx] = accumulated * 255 / (input.cols*input.rows);
 
+	if(idx < 256){
+		normalized_histogram[idx] = accumulated * 255 / (nx*ny);
+	}
 }
 
 __global__ void contrast_image(const char *input, char *output, int* normalized_histogram, int nx, int ny){
