@@ -27,7 +27,7 @@ __global__ void create_image_histogram(const char *input, int* histogram, int nx
 	unsigned int idx = iy * nx + ix;
 
 	if(idx < nx && idx < iy){
-			histogram[(int)input.data[idx]] ++;
+			histogram[(int)input[idx]] ++;
 	}
 
 
@@ -42,7 +42,7 @@ __global__ void normalize_histogram(const char *input,int* histogram, int* norma
 	for(int x = 0; x <= idx;  x ++){
 		accumulated += histogram[x];
 	}
-	normalized_histogram[idx] = accumulated * 255 / (input.cols*input.rows);
+	normalized_histogram[idx] = accumulated * 255 / (nx*ny);
 
 }
 
@@ -50,7 +50,7 @@ __global__ void contrast_image(const char *input, char *output, int* normalized_
 	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
-	output.data[idx] = normalized_histogram[ (int)input.data[idx] ];
+	output[idx] = normalized_histogram[ (int)input[idx] ];
 }
 
 
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
 	// checking image path
 	if(argc < 2)
-		imagePath = "Images/dog2	.jpeg";
+		imagePath = "Images/dog2.jpeg";
 	else
 		imagePath = argv[1];
 
