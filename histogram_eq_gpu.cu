@@ -5,8 +5,8 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
-#include "../common/common.h"
+#include <opencv2/imgproc/imgproc.hpp>
+#include "common.h"
 #include <cuda_runtime.h>
 
 using namespace std;
@@ -25,7 +25,7 @@ __global__ void create_image_histogram(const cv::Mat& input, int* histogram, int
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
 
-	atomicAdd(histogram[(int)input.data[idx]], 1)
+	atomicAdd(histogram[(int)input.data[idx]], 1);
 
 }
 
@@ -35,7 +35,7 @@ __global__ void normalize_histogram(const cv::Mat& input,int* histogram, int* no
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
 	int accumulated = 0;
-	for(int x = 0; 0 <= idx;  x ++){
+	for(int x = 0; x <= idx;  x ++){
 		accumulated += histogram[x];
 	}
 	normalized_histogram[idx] = accumulated * 255 / (input.cols*input.rows);
@@ -108,18 +108,19 @@ int main(int argc, char *argv[])
 	SAFE_CALL(cudaMemcpy(d_histogram, &histogram, rBytes, cudaMemcpyHostToDevice), "Error copying input image");
 	SAFE_CALL(cudaMemcpy(d_normalized_histogram, &normalized_histogram, rBytes, cudaMemcpyHostToDevice), "Error copying input image");
 
-
+	int dimx = 32;
+	int dimy = 32;
 	dim3 block(dimx, dimy);
 	dim3 grid((nx + block.x - 1) / block.x, (ny + block.y - 1) / block.y);
 
 
-	start_cpu =  chrono::high_resolution_clock::now();
+	auto start_cpu =  chrono::high_resolution_clock::now();
 	create_image_histogram<<<grid, block>>>(d_input, d_histogram, nx, ny);
 	normalize_histogram<<<grid, block>>>(d_input, d_histogram, d_normalized_histogram, nx, ny);
 	contrast_image<<<grid, block>>>(d_input, d_output, d_normalized_histogram, nx, ny);
 	SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
-	end_cpu =  chrono::high_resolution_clock::now();
-	duration_ms = end_cpu - start_cpu;
+	auto end_cpu =  chrono::high_resolution_clock::now();
+	chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
 
 	printf("elapsed %f ms\n", duration_ms.count());
 
