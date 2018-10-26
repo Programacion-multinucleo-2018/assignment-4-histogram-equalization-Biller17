@@ -1,3 +1,4 @@
+//nvcc -o test histogram_eq_gpu.cu -std=c++11 -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
 #include <iostream>
 #include <cstdio>
 #include <cmath>
@@ -10,9 +11,9 @@
 
 using namespace std;
 
-//Adrian Biller A01018940
-//historgram equalizer 
 
+//Adrian Biller A01018940
+//historgram equalizer
 
 
 
