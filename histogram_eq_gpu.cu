@@ -26,7 +26,10 @@ __global__ void create_image_histogram(const cv::Mat& input, int* histogram, int
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
 
-	atomicAdd(histogram[(int)input.data[idx]], 1);
+	if(idx < nx && idx < iy){
+			histogram[(int)input.data[idx]] ++;
+	}
+
 
 }
 
