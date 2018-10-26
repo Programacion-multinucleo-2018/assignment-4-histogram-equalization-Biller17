@@ -2,7 +2,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cmath>
-
+#include <omp.h>
+#include <chrono>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -100,7 +101,7 @@ int main(int argc, char *argv[])
 	int rBytes  = 256 * sizeof(int);
 	SAFE_CALL(cudaMalloc((void **)&d_input, nBytes), "Error allocating input image");
 	SAFE_CALL(cudaMalloc((void **)&d_output, nBytes), "Error allocating output image");
-	SAFE_CALL(cudaMalloc((void **)&d_histogram, nBytes), "Error allocating histogram");
+	SAFE_CALL(cudaMalloc((void **)&d_histogram, rBytes), "Error allocating histogram");
 	SAFE_CALL(cudaMalloc((void **)&d_normalized_histogram, rBytes), "Error allocating normalized histogram");
 
 
