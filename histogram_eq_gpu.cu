@@ -19,7 +19,7 @@ using namespace std;
 
 
 
-__global__ void create_image_histogram(const cv::Mat& input, int* histogram, int nx, int ny){
+__global__ void create_image_histogram(const char *input, int* histogram, int nx, int ny){
 
 
 	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
@@ -34,7 +34,7 @@ __global__ void create_image_histogram(const cv::Mat& input, int* histogram, int
 }
 
 
-__global__ void normalize_histogram(const cv::Mat& input,int* histogram, int* normalized_histogram, int nx, int ny){
+__global__ void normalize_histogram(const char *input,int* histogram, int* normalized_histogram, int nx, int ny){
 	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
@@ -46,7 +46,7 @@ __global__ void normalize_histogram(const cv::Mat& input,int* histogram, int* no
 
 }
 
-__global__ void contrast_image(const cv::Mat& input, cv::Mat& output, int* normalized_histogram, int nx, int ny){
+__global__ void contrast_image(const char *input, char *output, int* normalized_histogram, int nx, int ny){
 	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
