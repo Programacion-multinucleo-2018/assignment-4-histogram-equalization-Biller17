@@ -27,22 +27,21 @@ __global__ void create_image_histogram(const char *input, int* histogram, int nx
 	unsigned int idx = iy * nx + ix;
 
 	if(idx < nx && idx < iy){
-			histogram[(int)input[idx]] ++;
+			// histogram[(int)input[idx]] ++;
+			atomicAdd(&histogram[input[idx]], 1);
 	}
-
-
 }
 
 
 __global__ void normalize_histogram(char *input,int* histogram, int* normalized_histogram, int nx, int ny){
-	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
-	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
-	unsigned int idx = iy * nx + ix;
-	int accumulated = 0;
-	for(int x = 0; x <= idx;  x ++){
+	// unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
+	// unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
+	// unsigned int idx = iy * nx + ix;
+	float accumulated = 0;
+	for(int x = 0; x <= threadIdx.x;  x ++){
 		accumulated += histogram[x];
 	}
-	normalized_histogram[idx] = accumulated * 255 / (nx*ny);
+	normalized_histogram[threadIdx.x] = accumulated * (255 / (nx*ny));
 
 }
 
@@ -50,7 +49,8 @@ __global__ void contrast_image(char *input, char *output, int* normalized_histog
 	unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
 	unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
 	unsigned int idx = iy * nx + ix;
-	output[idx] = normalized_histogram[ (int)input[idx] ];
+	if(idx < nx*ny)
+		output[idx] = normalized_histogram[ (int)input[idx] ];
 }
 
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	int nx = grayscale_input.cols;
 	int ny = grayscale_input.rows;
 	int nxy = nx * ny;
-	int nBytes = nxy * sizeof(float);
+	int nBytes = grayscale_input.step*grayscale_input.rows;// * sizeof(float);
 	char *d_input, *d_output;
 	int *d_histogram, *d_normalized_histogram;
 	int rBytes  = 256 * sizeof(int);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 	auto start_cpu =  chrono::high_resolution_clock::now();
 	create_image_histogram<<<grid, block>>>(d_input, d_histogram, nx, ny);
-	normalize_histogram<<<grid, block>>>(d_input, d_histogram, d_normalized_histogram, nx, ny);
+	normalize_histogram<<<1, 256>>>(d_input, d_histogram, d_normalized_histogram, nx, ny);
 	contrast_image<<<grid, block>>>(d_input, d_output, d_normalized_histogram, nx, ny);
 	SAFE_CALL(cudaDeviceSynchronize(), "Error executing kernel");
 	auto end_cpu =  chrono::high_resolution_clock::now();
@@ -139,7 +139,8 @@ int main(int argc, char *argv[])
 	namedWindow("Input", cv::WINDOW_NORMAL);
 	namedWindow("Output", cv::WINDOW_NORMAL);
 
-
+	cv::resizeWindow("Input", 800, 600);
+	cv::resizeWindow("Output", 800, 600);
   //showing initial image vs contrast change
 	cv::imshow("Input", grayscale_input);
 	cv::imshow("Output", output);

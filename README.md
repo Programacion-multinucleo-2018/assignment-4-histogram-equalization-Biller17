@@ -25,6 +25,11 @@ Rubric:
 6. Both images are displayed at the end.
 7. Calculation times and speedup obtained are incuded in the Readme.
 
+**NOTES**
+
+1. Does not run with GPU. There is a segmentation fault.
+
+**Grade: 70**
 
 EDIT:
 
