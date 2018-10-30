@@ -2,9 +2,11 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <chrono>
 using namespace std;
 
-
+//compile with g++ -o test histogram_eq.cpp -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs
 //Adrian Biller A01018940
 
 // Histogram equalization function given an opencv mat and output
@@ -45,7 +47,7 @@ int main(int argc, char *argv[])
 
 	// checking image path
 	if(argc < 2)
-		imagePath = "Images/dog2	.jpeg";
+		imagePath = "Images/dog2.jpeg";
 	else
 		imagePath = argv[1];
 
@@ -67,7 +69,13 @@ int main(int argc, char *argv[])
   cv::Mat output(grayscale_input.rows, grayscale_input.cols, grayscale_input.type());
 
   //changing contrastof output image
+	auto start_cpu =  chrono::high_resolution_clock::now();
 	image_histogram_equalizer(grayscale_input, output);
+	auto end_cpu =  chrono::high_resolution_clock::now();
+	chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
+
+	printf("elapsed %f ms\n", duration_ms.count());
+
 
 	//Allow the windows to resize
 	namedWindow("Input", cv::WINDOW_NORMAL);
